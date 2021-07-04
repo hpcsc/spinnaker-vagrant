@@ -31,5 +31,6 @@ Vagrant.configure("2") do |config|
       spinnaker.vm.provision "file", source: "tmp/kube.config", destination: "${HOME}/.kube/config"
       spinnaker.vm.provision "shell", path: "scripts/setup-kubernetes-provider.sh", privileged: false, args: "local-kubernetes"
     end
+    spinnaker.vm.provision "shell", path: "scripts/wait-gate-api.sh"
   end
 end
