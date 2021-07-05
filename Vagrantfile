@@ -12,6 +12,7 @@ Vagrant.configure("2") do |config|
     spinnaker.vm.network "forwarded_port", guest: 9000, host: 9000 # Deck port
     spinnaker.vm.network "forwarded_port", guest: 8084, host: 8084 # Gate port
     spinnaker.vm.network "forwarded_port", guest: 9001, host: 9001 # MinIO port
+    spinnaker.vm.network "forwarded_port", guest: 3000, host: 3000 # Gogs
 
     spinnaker.vm.provider "virtualbox" do |v|
       v.name = name
@@ -19,10 +20,16 @@ Vagrant.configure("2") do |config|
       v.customize ["modifyvm", :id, "--cpus", 4]
     end
 
+
     spinnaker.vm.provision "file", source: "hal/profiles/front50-local.yml", destination: "${HOME}/.hal/default/profiles/front50-local.yml"
     spinnaker.vm.provision "file", source: "hal/service-settings/deck.yml", destination: "${HOME}/.hal/default/service-settings/deck.yml"
     spinnaker.vm.provision "file", source: "hal/service-settings/gate.yml", destination: "${HOME}/.hal/default/service-settings/gate.yml"
+    spinnaker.vm.provision "file", source: "gogs", destination: "${HOME}/gogs"
     spinnaker.vm.provision "shell", path: "scripts/install-docker.sh", privileged: false
+    spinnaker.vm.provision "shell", path: "scripts/install-gogs.sh", privileged: false, env: {
+      "GOGS_VERSION" => "0.12.3",
+      "GOGS_POSTGRES_VERSION" => "13.3-alpine"
+    }, args: "local-git"
     spinnaker.vm.provision "shell", path: "scripts/install-hal.sh", privileged: false
     spinnaker.vm.provision "shell", path: "scripts/setup-minio.sh", privileged: false
     spinnaker.vm.provision "shell", path: "scripts/install-spinnaker.sh", args: spinnaker_version

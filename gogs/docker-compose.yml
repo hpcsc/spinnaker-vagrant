@@ -1,0 +1,19 @@
+version: '3'
+services:
+  git-repo:
+    image: gogs/gogs:${GOGS_VERSION}
+    ports:
+      - "10022:22"
+      - "3000:3000"
+    depends_on:
+      - git-repo-db
+    volumes:
+      - ./conf:/data/gogs/conf
+
+  git-repo-db:
+    image: postgres:${GOGS_POSTGRES_VERSION}
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespw
